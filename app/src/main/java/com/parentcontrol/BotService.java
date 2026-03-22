@@ -63,8 +63,8 @@ public class BotService extends Service {
 
         createNotificationChannel();
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Status")
-            .setContentText("Работает в фоне")
+            .setContentTitle("YouTube")
+            .setContentText("Активен")
             .setSmallIcon(android.R.drawable.stat_notify_sync)
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .build();
